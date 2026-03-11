@@ -13,7 +13,7 @@ import { Prompt, FeedItem } from "@/types";
 import type { User } from "@supabase/supabase-js";
 
 const MAX_BATCHES = 10;
-const GUEST_LIMIT = 3;        // 비로그인 최대 사용 횟수
+const GUEST_LIMIT = 10;       // 비로그인 최대 사용 횟수
 const GUEST_STORAGE_KEY = "ai_feed_guest_count";
 
 function HomeContent() {
