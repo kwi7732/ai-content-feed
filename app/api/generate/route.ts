@@ -25,8 +25,9 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY ?? ""
 );
 
-// ─── AI provider (env: AI_PROVIDER=openai|grok, default: openai) ────────────
-const AI_PROVIDER = (process.env.AI_PROVIDER ?? "openai").toLowerCase();
+// ─── AI provider 설정 (코드내 고정) ───────────────────────────────────
+// 모델 변경 시 이 파일만 수정만 하면 됨 (env 불필요)
+const AI_PROVIDER = "grok" as const;  // "grok" | "openai"
 
 const openai = new OpenAI(
   AI_PROVIDER === "grok"
@@ -34,7 +35,7 @@ const openai = new OpenAI(
     : { apiKey: process.env.OPENAI_API_KEY }
 );
 
-const AI_MODEL = AI_PROVIDER === "grok" ? "grok-4-fast" : "gpt-4o-mini";
+const AI_MODEL = AI_PROVIDER === "grok" ? "grok-2" : "gpt-4o-mini";
 
 // ─── System prompt (JSON mode enforced) ─────────────────────────────────────
 const SYSTEM_PROMPT = `너는 만능 콘텐츠 크리에이터야. 사용자의 요청에 따라 콘텐츠를 생성하되, 어떠한 인사말이나 부연 설명 없이 반드시 아래의 JSON 규격으로만 출력해.
