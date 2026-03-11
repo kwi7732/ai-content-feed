@@ -40,6 +40,8 @@ function HomeContent() {
   const [batchCount, setBatchCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [shareCopied, setShareCopied] = useState(false);
+  const [expandedPrompt, setExpandedPrompt] = useState<{text: string; type: string; tone: string} | null>(null);
+  const [showPromptPreview, setShowPromptPreview] = useState(false);
 
   const currentPromptRef = useRef("");
   const previousTitlesRef = useRef<string[]>([]);
@@ -139,6 +141,8 @@ function HomeContent() {
       setFeedItems([]);
       setBatchCount(0);
       setHasMore(false);
+      setExpandedPrompt(null);
+      setShowPromptPreview(false);
     }
 
     try {
@@ -170,6 +174,16 @@ function HomeContent() {
 
       // Increment guest count on success
       if (!user) incrementGuestCount();
+
+      // Stage 1 결과 저장 (프롬프트 미리보기)
+      if (data.expandedPrompt) {
+        setExpandedPrompt({
+          text: data.expandedPrompt,
+          type: data.contentType ?? "",
+          tone: data.tone ?? "",
+        });
+        setShowPromptPreview(true);
+      }
 
       const newItems: FeedItem[] = data.feed_items ?? [];
       previousTitlesRef.current = [...previousTitlesRef.current, ...newItems.map((i: FeedItem) => i.title)];
@@ -366,6 +380,61 @@ function HomeContent() {
             </p>
           </div>
         )}
+
+        {/* ── AI 프롬프트 미리보기 카드 ── */}
+        <AnimatePresence>
+          {expandedPrompt && feedItems.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="max-w-2xl mx-auto px-3 sm:px-4 mt-4"
+            >
+              <button
+                onClick={() => setShowPromptPreview((v) => !v)}
+                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/20 text-left group hover:border-indigo-500/40 transition-all"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-indigo-400 text-xs shrink-0">🤖 AI 해석</span>
+                  {expandedPrompt.type && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0">
+                      {expandedPrompt.type}
+                    </span>
+                  )}
+                  {expandedPrompt.tone && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0">
+                      {expandedPrompt.tone}
+                    </span>
+                  )}
+                  {!showPromptPreview && (
+                    <p className="text-xs text-gray-500 truncate ml-1 hidden sm:block">
+                      {expandedPrompt.text}
+                    </p>
+                  )}
+                </div>
+                <span className="text-gray-500 text-xs shrink-0 ml-2">
+                  {showPromptPreview ? "▲ 접기" : "▼ 펼치기"}
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {showPromptPreview && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="px-4 py-3 text-xs text-gray-400 leading-relaxed bg-indigo-950/30 border border-t-0 border-indigo-500/20 rounded-b-xl">
+                      {expandedPrompt.text}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <InfiniteFeed
           items={feedItems}
