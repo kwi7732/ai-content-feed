@@ -35,7 +35,7 @@ const openai = new OpenAI(
     : { apiKey: process.env.OPENAI_API_KEY }
 );
 
-const AI_MODEL = AI_PROVIDER === "grok" ? "grok-2" : "gpt-4o-mini";
+const AI_MODEL = AI_PROVIDER === "grok" ? "grok-4-fast" : "gpt-4o-mini";
 
 // ─── System prompt (JSON mode enforced) ─────────────────────────────────────
 const SYSTEM_PROMPT = `너는 만능 콘텐츠 크리에이터야. 사용자의 요청에 따라 콘텐츠를 생성하되, 어떠한 인사말이나 부연 설명 없이 반드시 아래의 JSON 규격으로만 출력해.
